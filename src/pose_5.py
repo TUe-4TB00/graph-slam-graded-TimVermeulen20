@@ -23,6 +23,7 @@ def add_pose(graph, initial_estimate, pose_5):
 
 def add_landmark_measurement(graph, result, pose_5, landmark):
     landmark_point = result.atPoint2(L(landmark))
+
     graph = add_landmark_measurement_from_global(
         graph=graph,
         pose_key=X(5),
@@ -31,7 +32,9 @@ def add_landmark_measurement(graph, result, pose_5, landmark):
         landmark_point=landmark_point,
         measurement_noise=MEASUREMENT_NOISE
     )
+
     return graph
+
 
 def optimize(graph, initial_estimate):
     # TODO: Initialize the optimizer
@@ -108,13 +111,8 @@ def minimize_errors(graph, initial_estimate, pose_options):
             result = optimize(graph_copy, result)
 
             # TODO: create a list of errors (each index corresponds to a pose) and add the error of each pose to the list
-            marginals = gtsam.Marginals(graph_copy, result)
-
-            list_of_errors = [
-                marginals.marginalCovariance(X(1)).sum(),
-                marginals.marginalCovariance(X(2)).sum(),
-                marginals.marginalCovariance(X(3)).sum()
-            ]
+            list_of_errors = []
+            list_of_errors.append(graph_copy.error(result))
 
             # TODO: compute the sum of the errors and return it along with the best pose and landmark
             sum_of_errors = sum(list_of_errors)
